@@ -73,15 +73,14 @@ class Text_Classifier():
         print(model.summary())
         return model
     
-    def plot_loss(self, history):
+    def plot_metrics(self, history):
         plt.title('Loss')
         plt.plot(history.history['loss'], label='train')
         plt.plot(history.history['val_loss'], label='test')
         plt.legend()
         plt.plot()
         plt.show()
-    
-    def plot_accuracy(self, history):
+
         plt.title('Accuracy')
         plt.plot(history.history['accuracy'], label='train')
         plt.plot(history.history['val_accuracy'], label='test')
@@ -104,8 +103,7 @@ class Text_Classifier():
         history = model.fit(X_train, y_train, epochs=epochs, validation_split=validation_split, batch_size=batch_size, shuffle=shuffle)
 
         if plot_diagnostics:
-            self.plot_accuracy(history)
-            self.plot_loss(history)
+            self.plot_metrics(history)
         
         return model, history
 
