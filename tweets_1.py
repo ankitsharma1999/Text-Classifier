@@ -16,18 +16,22 @@ X_train, y_train = np.asarray(df['text']), np.asarray(df['target'])
 
 #maxLen = len(max(X_train, key=len).split())
 
-for i in range(len(X_train)):
-    X_train[i] = X_train[i].lower()
-    X_train[i] = re.sub(r'\d+', '', X_train[i])
-    X_train[i] = re.sub(r'[!”#$%&’()*+,-./:;<=>?@[\]^_`{|}~]', '', X_train[i])
-    X_train[i].strip()
+def preprocess(X_train):
+    for i in range(len(X_train)):
+        X_train[i] = X_train[i].lower()
+        X_train[i] = re.sub(r'\d+', '', X_train[i])
+        X_train[i] = re.sub(r'[!”#$%&’()*+,-./:;<=>?@[\]^_`{|}~]', '', X_train[i])
+        X_train[i].strip()
 
-tok = Tokenizer()
-tok.fit_on_texts(X_train)
-X_train = tok.texts_to_sequences(X_train)
-maxLen = len(max(X_train, key=len))
-X_train = pad_sequences(X_train, maxlen=maxLen)
-v_size = len(tok.word_index) + 1
+    tok = Tokenizer()
+    tok.fit_on_texts(X_train)
+    X_train = tok.texts_to_sequences(X_train)
+    maxLen = len(max(X_train, key=len))
+    X_train = pad_sequences(X_train, maxlen=maxLen)
+    v_size = len(tok.word_index) + 1
+    return X_train, maxLen, v_size, tok
+
+X_train, maxLen, v_size, tok = preprocess(X_train)
 
 embedding_vector = {}
 f = open('Glove/glove.6B.50d.txt')
@@ -65,7 +69,7 @@ plot_model(model, to_file='model_final_{}.png'.format(int(time.time())))
 model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
 
 print("Training....")
-history = model.fit(X_train, y_train, epochs=200, validation_split=0.1, batch_size=28, shuffle=True)
+history = model.fit(X_train, y_train, epochs=20, validation_split=0.1, batch_size=28, shuffle=True)
 
 plt.title('Loss')
 plt.plot(history.history['loss'], label='train')
