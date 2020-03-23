@@ -107,8 +107,17 @@ class Text_Classifier():
         
         return model, history
 
+    def predict(self, X_test, model):
+        X_test, _, _, _ = self.preprocessing(X_test)
+        res = model.predict(X_test)
+        return res
+
 if __name__ == '__main__':
     data = 'Tweets/train.csv'
     embd = 'Glove/glove.6B.50d.txt'
     clf = Text_Classifier(data, embd, 50, 10, 4, 0.5, 0.5)
     model, history = clf.train()
+
+    df = pd.read_csv('Tweets/test.csv')
+    X_test = np.asarray(df['text'])
+    res = clf.predict(X_test, model)
