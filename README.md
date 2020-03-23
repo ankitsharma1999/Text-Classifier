@@ -4,3 +4,5 @@ This is a text calssifier for classifying tweets into 2 categories(about a disas
 
 #### Loss vs Epochs
 ![](bestone.png)
+
+The dataset used is downloaded from [here](https://www.kaggle.com/c/nlp-getting-started).
