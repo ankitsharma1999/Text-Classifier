@@ -1,4 +1,5 @@
 import re
+import sys
 import time
 import numpy as np
 import pandas as pd
@@ -132,8 +133,8 @@ if __name__ == '__main__':
     data = 'Tweets/train.csv'
     embd = 'Glove/glove.6B.50d.txt'
     clf = Text_Classifier(data, embd, 50, 10, 4, 0.5, 0.5)
-    model, history = clf.train(option='gru')
-
+    arg = (sys.argv)[1]
+    model, history = clf.train(option=arg)
     df = pd.read_csv('Tweets/test.csv')
     X_test = np.asarray(df['text'])
     res = clf.predict(X_test, model)
