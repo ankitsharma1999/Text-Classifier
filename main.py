@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 from keras.utils.vis_utils import plot_model
 from keras.preprocessing.text import Tokenizer
 from keras.preprocessing.sequence import pad_sequences
-from keras.layers import Dense, LSTM, Dropout, Activation, Embedding, Input, Bidirectional
+from keras.layers import Dense, LSTM, Dropout, Activation, Embedding, Input, Bidirectional, GRU
 
 class Text_Classifier():
 
@@ -72,6 +72,19 @@ class Text_Classifier():
         model = Model(inputs=ip, outputs=op)
         print(model.summary())
         return model
+
+    def modelArchitecture_2(self,v_size, maxLen, emb_matrix):
+        ip = Input(shape=(maxLen,))
+        emb = Embedding(v_size,self.emb_size,weights = [emb_matrix],trainable = False)(ip)
+        lstm_1 = Bidirectional(GRU(self.lstm1Units, return_sequences=True))(emb)
+        drop_1 = Dropout(self.d_1)(lstm_1)
+        lstm_2 = GRU(self.lstm2Units)(drop_1)
+        drop_2 = Dropout(self.d_2)(lstm_2)
+        dense_1 = Dense(1)(drop_2)
+        op = Activation('sigmoid')(dense_1)
+        model = Model(inputs=ip, outputs=op)
+        print(model.summary())
+        return model
     
     def plot_metrics(self, history):
         plt.title('Loss')
@@ -88,11 +101,14 @@ class Text_Classifier():
         plt.plot()
         plt.show()
 
-    def train(self, epochs=20, batch_size=28, validation_split=0.1, shuffle=True, opt='adam', plot_modelArchitecture=False, plot_diagnostics=True):
+    def train(self, epochs=20, batch_size=28, validation_split=0.1, shuffle=True, opt='adam', plot_modelArchitecture=False, plot_diagnostics=True, option='lstm'):
         X_train, y_train = self.loadData()
         X_train, maxLen, v_size, tok = self.preprocessing(X_train)
         emb_matrix = self.loadEmbeddings(X_train, tok, v_size)
-        model = self.modelArchitecture_1(v_size, maxLen, emb_matrix)
+        if option == 'lstm':
+            model = self.modelArchitecture_1(v_size, maxLen, emb_matrix)
+        elif option == 'gru':
+            model = self.modelArchitecture_2(v_size, maxLen, emb_matrix)
 
         if plot_modelArchitecture:
             plot_model(model, to_file='model_final_{}.png'.format(int(time.time())))
@@ -116,7 +132,7 @@ if __name__ == '__main__':
     data = 'Tweets/train.csv'
     embd = 'Glove/glove.6B.50d.txt'
     clf = Text_Classifier(data, embd, 50, 10, 4, 0.5, 0.5)
-    model, history = clf.train()
+    model, history = clf.train(option='gru')
 
     df = pd.read_csv('Tweets/test.csv')
     X_test = np.asarray(df['text'])
