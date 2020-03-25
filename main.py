@@ -60,7 +60,7 @@ class Text_Classifier():
         print('Glove Loaded.')
         return embedding_matrix
     
-    def modelArchitecture(self,v_size, maxLen, emb_matrix):
+    def modelArchitecture_1(self,v_size, maxLen, emb_matrix):
         ip = Input(shape=(maxLen,))
         emb = Embedding(v_size,self.emb_size,weights = [emb_matrix],trainable = False)(ip)
         lstm_1 = Bidirectional(LSTM(self.lstm1Units, return_sequences=True))(emb)
@@ -92,7 +92,7 @@ class Text_Classifier():
         X_train, y_train = self.loadData()
         X_train, maxLen, v_size, tok = self.preprocessing(X_train)
         emb_matrix = self.loadEmbeddings(X_train, tok, v_size)
-        model = self.modelArchitecture(v_size, maxLen, emb_matrix)
+        model = self.modelArchitecture_1(v_size, maxLen, emb_matrix)
 
         if plot_modelArchitecture:
             plot_model(model, to_file='model_final_{}.png'.format(int(time.time())))
